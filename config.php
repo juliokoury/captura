@@ -1,8 +1,8 @@
 <?php
-$host = getenv('DB_HOST') ?: 'localhost';
-$db = getenv('DB_NAME') ?: 'clinic_saas';
+$host = getenv('DB_HOST') ?: 'captura-leads';
+$db = getenv('DB_NAME') ?: 'leads';
 $user = getenv('DB_USER') ?: 'root';
-$pass = getenv('DB_PASS') ?: '';
+$pass = getenv('DB_PASS') ?: 'gabi1980';
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
@@ -18,4 +18,5 @@ try {
     // In production, log this error instead of showing it
     throw new \PDOException($e->getMessage(), (int) $e->getCode());
 }
+
 ?>

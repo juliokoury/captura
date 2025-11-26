@@ -29,7 +29,7 @@ $aiResult = [
     'resumo' => 'Análise pendente (API Key não configurada)'
 ];
 
-if ($geminiApiKey !== 'YOUR_GEMINI_API_KEY') {
+if ($geminiApiKey = getenv('GEMINI_API_KEY') ?: 'AIzaSyCv77d24ByVvUmTyJ0TMhn3Wt-1OoeUuO0';) {
     $prompt = "Você é um assistente de triagem de pacientes para uma clínica de ortopedia e medicina intervencionista da dor. Receba as respostas abaixo e devolva um JSON contendo: urgencia (baixa, média, alta), tags_ai (lista com insights), resumo (descrição curta do quadro do paciente). Responda apenas com JSON puro.\n\nDados do paciente:\nNome: $nome\nIdade: $idade\nLocal da dor: $local_dor\nTempo da dor: $tempo_dor\nInteresse na consulta: $interesse";
 
     $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . $geminiApiKey;
@@ -103,4 +103,5 @@ try {
     http_response_code(500);
     echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
 }
+
 ?>

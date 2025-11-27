@@ -18,7 +18,7 @@ function showStep(stepIndex) {
     if (stepElement) {
         stepElement.classList.remove('hidden');
         stepElement.classList.add('slide-enter-active');
-        
+
         // Focus on input if exists
         const input = stepElement.querySelector('input');
         if (input) {
@@ -33,7 +33,7 @@ function showStep(stepIndex) {
     } else if (stepIndex === 0) {
         form.classList.add('hidden');
     }
-    
+
     updateProgressBar();
 }
 
@@ -76,24 +76,34 @@ function submitForm(interestValue) {
         },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
-    .then(result => {
-        document.getElementById('loading-screen').classList.add('hidden');
-        document.getElementById('success-screen').classList.remove('hidden');
-        console.log('Success:', result);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Ocorreu um erro ao enviar seus dados. Por favor, tente novamente.');
-        document.getElementById('loading-screen').classList.add('hidden');
-        document.getElementById('quiz-form').classList.remove('hidden');
-    });
+        .then(async response => {
+            const text = await response.text();
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                throw new Error('Resposta inválida do servidor: ' + text.substring(0, 50) + '...');
+            }
+        })
+        .then(result => {
+            if (result.error) {
+                throw new Error(result.error);
+            }
+            document.getElementById('loading-screen').classList.add('hidden');
+            document.getElementById('success-screen').classList.remove('hidden');
+            console.log('Success:', result);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Erro: ' + error.message);
+            document.getElementById('loading-screen').classList.add('hidden');
+            document.getElementById('quiz-form').classList.remove('hidden');
+        });
 }
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     showStep(0);
-    
+
     // Allow Enter key to go to next step
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {

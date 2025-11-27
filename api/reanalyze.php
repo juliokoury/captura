@@ -25,20 +25,6 @@ $stmt = $pdo->prepare("SELECT * FROM leads WHERE id = ?");
 $stmt->execute([$id]);
 $lead = $stmt->fetch();
 
-if (!$lead) {
-    http_response_code(404);
-    echo json_encode(['error' => 'Lead not found']);
-    exit;
-}
-
-// Gemini AI Integration (Reused logic - ideally refactor to a function)
-$geminiApiKey = 'YOUR_GEMINI_API_KEY'; // REPLACE THIS WITH YOUR ACTUAL KEY
-$aiResult = [
-    'urgencia' => 'baixa',
-    'tags_ai' => [],
-    'resumo' => 'Reanálise falhou ou sem chave API.'
-];
-
 if ($geminiApiKey !== 'YOUR_GEMINI_API_KEY') {
     $prompt = "Você é um assistente de triagem de pacientes para uma clínica de ortopedia e medicina intervencionista da dor. REANÁLISE. Receba as respostas abaixo e devolva um JSON contendo: urgencia (baixa, média, alta), tags_ai (lista com insights), resumo (descrição curta do quadro do paciente). Responda apenas com JSON puro.\n\nDados do paciente:\nNome: {$lead['nome']}\nIdade: {$lead['idade']}\nLocal da dor: {$lead['local_dor']}\nTempo da dor: {$lead['tempo_dor']}";
 

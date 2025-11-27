@@ -26,6 +26,20 @@ $geminiApiKey = 'AIzaSyCv77d24ByVvUmTyJ0TMhn3Wt-1OoeUuO0'; // Hardcoded
 $aiResult = [
     'urgencia' => 'baixa',
     'tags_ai' => [],
+    'resumo' => 'Análise pendente (Erro na API)'
+];
+
+if ($geminiApiKey) {
+    $prompt = "Você é um assistente de triagem de pacientes para uma clínica de ortopedia e medicina intervencionista da dor. Receba as respostas abaixo e devolva um JSON contendo: urgencia (baixa, média, alta), tags_ai (lista com insights), resumo (descrição curta do quadro do paciente). Responda apenas com JSON puro.\n\nDados do paciente:\nNome: $nome\nIdade: $idade\nLocal da dor: $local_dor\nTempo da dor: $tempo_dor\nInteresse na consulta: $interesse";
+
+    // Using gemini-2.0-flash as confirmed in user's model list
+    $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . $geminiApiKey;
+
+    $payload = [
+        "contents" => [
+            [
+                "parts" => [
+                    ["text" => $prompt]
                 ]
             ]
         ]

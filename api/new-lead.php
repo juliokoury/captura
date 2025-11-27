@@ -45,36 +45,6 @@ if ($geminiApiKey) {
         ]
     ];
 
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-
-    $response = curl_exec($ch);
-
-    if ($response) {
-        $responseData = json_decode($response, true);
-        if (isset($responseData['candidates'][0]['content']['parts'][0]['text'])) {
-            $aiText = $responseData['candidates'][0]['content']['parts'][0]['text'];
-            // Clean up markdown code blocks if present
-            $aiText = str_replace(['```json', '```'], '', $aiText);
-            $aiJson = json_decode($aiText, true);
-
-            if ($aiJson) {
-                $aiResult['urgencia'] = strtolower($aiJson['urgencia'] ?? 'baixa');
-                $aiResult['tags_ai'] = $aiJson['tags_ai'] ?? [];
-                $aiResult['resumo'] = $aiJson['resumo'] ?? '';
-            }
-        }
-    }
-    curl_close($ch);
-}
-
-// Map urgency to valid enum values just in case
-$validUrgency = ['baixa', 'media', 'alta'];
-if (!in_array($aiResult['urgencia'], $validUrgency)) {
-    // Handle 'média' vs 'media' or other variations
     if ($aiResult['urgencia'] == 'média')
         $aiResult['urgencia'] = 'media';
     else

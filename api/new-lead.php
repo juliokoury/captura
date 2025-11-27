@@ -15,27 +15,6 @@ if (!$data) {
 // Extract fields
 $nome = $data['nome'] ?? '';
 $como_quer_ser_chamado = $data['como_quer_ser_chamado'] ?? '';
-$telefone = $data['telefone'] ?? '';
-$idade = $data['idade'] ?? 0;
-$local_dor = $data['local_dor'] ?? '';
-$tempo_dor = $data['tempo_dor'] ?? '';
-$interesse = $data['interesse'] ?? 'Não informado';
-
-// Gemini AI Integration
-$geminiApiKey = getenv('GEMINI_API_KEY') ?: 'AIzaSyCv77d24ByVvUmTyJ0TMhn3Wt-1OoeUuO0';
-$aiResult = [
-    'urgencia' => 'baixa',
-    'tags_ai' => [],
-    'resumo' => 'Análise pendente (API Key não configurada)'
-];
-
-if ($geminiApiKey && $geminiApiKey !== 'YOUR_GEMINI_API_KEY') {
-    $prompt = "Você é um assistente de triagem de pacientes para uma clínica de ortopedia e medicina intervencionista da dor. Receba as respostas abaixo e devolva um JSON contendo: urgencia (baixa, média, alta), tags_ai (lista com insights), resumo (descrição curta do quadro do paciente). Responda apenas com JSON puro.\n\nDados do paciente:\nNome: $nome\nIdade: $idade\nLocal da dor: $local_dor\nTempo da dor: $tempo_dor\nInteresse na consulta: $interesse";
-
-    $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . $geminiApiKey;
-
-    $payload = [
-        "contents" => [
             [
                 "parts" => [
                     ["text" => $prompt]

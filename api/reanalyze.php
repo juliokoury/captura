@@ -32,30 +32,66 @@ try {
         exit;
     }
 
-    // Gemini AI Integration
-    $geminiApiKey = getenv('GEMINI_API_KEY') ?: 'AIzaSyCv77d24ByVvUmTyJ0TMhn3Wt-1OoeUuO0';
+    // Gemini AI Integration - Hardcoded as requested
+    $geminiApiKey = 'AIzaSyCv77d24ByVvUmTyJ0TMhn3Wt-1OoeUuO0';
 
     $aiResult = [
         'urgencia' => 'baixa',
         'tags_ai' => [],
-        'resumo' => 'Reanálise falhou ou sem chave API.'
+        'resumo' => 'Reanálise falhou.'
     ];
 
-    if ($geminiApiKey && $geminiApiKey !== 'YOUR_GEMINI_API_KEY') {
-        $prompt = "Você é um assistente de triagem de pacientes para uma clínica de ortopedia e medicina intervencionista da dor. REANÁLISE. Receba as respostas abaixo e devolva um JSON contendo: urgencia (baixa, média, alta), tags_ai (lista com insights), resumo (descrição curta do quadro do paciente). Responda apenas com JSON puro.\n\nDados do paciente:\nNome: {$lead['nome']}\nIdade: {$lead['idade']}\nLocal da dor: {$lead['local_dor']}\nTempo da dor: {$lead['tempo_dor']}";
+    $prompt = "Você é um assistente de triagem de pacientes para uma clínica de ortopedia e medicina intervencionista da dor. REANÁLISE. Receba as respostas abaixo e devolva um JSON contendo: urgencia (baixa, média, alta), tags_ai (lista com insights), resumo (descrição curta do quadro do paciente). Responda apenas com JSON puro.\n\nDados do paciente:\nNome: {$lead['nome']}\nIdade: {$lead['idade']}\nLocal da dor: {$lead['local_dor']}\nTempo da dor: {$lead['tempo_dor']}";
 
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . $geminiApiKey;
+    $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . $geminiApiKey;
 
-        $payload = [
-            "contents" => [
-                [
-                    "parts" => [
-                        ["text" => $prompt]
-                    ]
+    $payload = [
+        "contents" => [
+            [
+                "parts" => [
+                    ["text" => $prompt]
                 ]
             ]
-        ];
+        ]
+    ];
 
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+
+    $response = curl_exec($ch);
+
+    if ($response === false) {
+        $aiResult['resumo'] = 'Erro CURL: ' . curl_error($ch);
+    } else {
+        $responseData = json_decode($response, true);
+
+        if (isset($responseData['error'])) {
+            $aiResult['resumo'] = 'Erro API Gemini: ' . ($responseData['error']['message'] ?? 'Desconhecido');
+        } elseif (isset($responseData['candidates'][0]['content']['parts'][0]['text'])) {
+            $aiText = $responseData['candidates'][0]['content']['parts'][0]['text'];
+            $aiText = str_replace(['```json', '```'], '', $aiText);
+            $aiJson = json_decode($aiText, true);
+
+            if ($aiJson) {
+                $aiResult['urgencia'] = strtolower($aiJson['urgencia'] ?? 'baixa');
+                $aiResult['tags_ai'] = $aiJson['tags_ai'] ?? [];
+                $aiResult['resumo'] = $aiJson['resumo'] ?? '';
+            } else {
+                $aiResult['resumo'] = 'Erro ao ler JSON da IA.';
+            }
+        } else {
+            $aiResult['resumo'] = 'Resposta inesperada da API.';
+        }
+    }
+    curl_close($ch);
+
+    // Normalize urgency
+    $validUrgency = ['baixa', 'media', 'alta'];
+    if (!in_array($aiResult['urgencia'], $validUrgency)) {
+        if ($aiResult['urgencia'] == 'média')
             $aiResult['urgencia'] = 'media';
         else
             $aiResult['urgencia'] = 'baixa';

@@ -37,20 +37,6 @@ try {
 
     $aiResult = [
         'urgencia' => 'baixa',
-        'tags_ai' => [],
-        'resumo' => 'Reanálise falhou.'
-    ];
-
-    $prompt = "Você é um assistente de triagem de pacientes para uma clínica de ortopedia e medicina intervencionista da dor. REANÁLISE. Receba as respostas abaixo e devolva um JSON contendo: urgencia (baixa, média, alta), tags_ai (lista com insights), resumo (descrição curta do quadro do paciente). Responda apenas com JSON puro.\n\nDados do paciente:\nNome: {$lead['nome']}\nIdade: {$lead['idade']}\nLocal da dor: {$lead['local_dor']}\nTempo da dor: {$lead['tempo_dor']}";
-
-    // Updated model to gemini-1.5-flash-001
-    $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-001:generateContent?key=" . $geminiApiKey;
-
-    $payload = [
-        "contents" => [
-            [
-                "parts" => [
-                    ["text" => $prompt]
                 ]
             ]
         ]

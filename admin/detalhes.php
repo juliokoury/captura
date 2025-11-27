@@ -106,20 +106,6 @@ if (!$lead) {
                         <h3 class="font-serif text-2xl text-primary">Análise IA</h3>
                         <button onclick="reanalyzeAI(<?php echo $lead['id']; ?>)" id="btn-reanalyze"
                             class="text-sm bg-highlight text-white px-3 py-1 rounded hover:bg-yellow-600 transition-colors">
-                            Reanalisar IA
-                        </button>
-                    </div>
-
-                    <div class="mb-4">
-                        <strong class="block text-secondary mb-1">Resumo do Quadro:</strong>
-                        <p class="text-gray-700 italic leading-relaxed">
-                            "<?php echo nl2br(htmlspecialchars($lead['resumo_ai'])); ?>"</p>
-                    </div>
-
-                    <div>
-                        <strong class="block text-secondary mb-2">Tags Sugeridas:</strong>
-                        <div class="flex flex-wrap gap-2">
-                            <?php
                             if (!empty($lead['tags_ai'])):
                                 $tags = explode(',', $lead['tags_ai']);
                                 foreach ($tags as $tag):

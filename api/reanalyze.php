@@ -63,20 +63,6 @@ try {
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
 
     $response = curl_exec($ch);
-
-    if ($response === false) {
-        $aiResult['resumo'] = 'Erro CURL: ' . curl_error($ch);
-    } else {
-        $responseData = json_decode($response, true);
-
-        if (isset($responseData['error'])) {
-            $aiResult['resumo'] = 'Erro API Gemini: ' . ($responseData['error']['message'] ?? 'Desconhecido');
-        } elseif (isset($responseData['candidates'][0]['content']['parts'][0]['text'])) {
-            $aiText = $responseData['candidates'][0]['content']['parts'][0]['text'];
-            $aiText = str_replace(['```json', '```'], '', $aiText);
-            $aiJson = json_decode($aiText, true);
-
-            if ($aiJson) {
                 $aiResult['urgencia'] = strtolower($aiJson['urgencia'] ?? 'baixa');
                 $aiResult['tags_ai'] = $aiJson['tags_ai'] ?? [];
                 $aiResult['resumo'] = $aiJson['resumo'] ?? '';
